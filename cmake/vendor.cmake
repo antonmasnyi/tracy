@@ -34,24 +34,29 @@ endif()
 # GLFW
 
 if(NOT USE_WAYLAND AND NOT EMSCRIPTEN)
-    pkg_check_modules(GLFW glfw3)
-    if (GLFW_FOUND AND NOT DOWNLOAD_GLFW)
-        add_library(TracyGlfw3 INTERFACE)
-        target_include_directories(TracyGlfw3 INTERFACE ${GLFW_INCLUDE_DIRS})
-        target_link_libraries(TracyGlfw3 INTERFACE ${GLFW_LINK_LIBRARIES})
-    else()
-        CPMAddPackage(
-            NAME glfw
-            GITHUB_REPOSITORY glfw/glfw
-            GIT_TAG 3.4
-            OPTIONS
-                "GLFW_BUILD_EXAMPLES OFF"
-                "GLFW_BUILD_TESTS OFF"
-                "GLFW_BUILD_DOCS OFF"
-                "GLFW_INSTALL OFF"
-        )
+    if (TARGET glfw)
         add_library(TracyGlfw3 INTERFACE)
         target_link_libraries(TracyGlfw3 INTERFACE glfw)
+    else()
+        pkg_check_modules(GLFW glfw3)
+        if (GLFW_FOUND AND NOT DOWNLOAD_GLFW)
+            add_library(TracyGlfw3 INTERFACE)
+            target_include_directories(TracyGlfw3 INTERFACE ${GLFW_INCLUDE_DIRS})
+            target_link_libraries(TracyGlfw3 INTERFACE ${GLFW_LINK_LIBRARIES})
+        else()
+            CPMAddPackage(
+                NAME glfw
+                GITHUB_REPOSITORY glfw/glfw
+                GIT_TAG 3.4
+                OPTIONS
+                    "GLFW_BUILD_EXAMPLES OFF"
+                    "GLFW_BUILD_TESTS OFF"
+                    "GLFW_BUILD_DOCS OFF"
+                    "GLFW_INSTALL OFF"
+            )
+            add_library(TracyGlfw3 INTERFACE)
+            target_link_libraries(TracyGlfw3 INTERFACE glfw)
+        endif()
     endif()
 endif()
 
