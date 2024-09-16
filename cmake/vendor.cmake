@@ -62,22 +62,27 @@ endif()
 
 # freetype
 
-pkg_check_modules(FREETYPE freetype2)
-if (FREETYPE_FOUND AND NOT DOWNLOAD_FREETYPE)
-    add_library(TracyFreetype INTERFACE)
-    target_include_directories(TracyFreetype INTERFACE ${FREETYPE_INCLUDE_DIRS})
-    target_link_libraries(TracyFreetype INTERFACE ${FREETYPE_LINK_LIBRARIES})
-else()
-    CPMAddPackage(
-        NAME freetype
-        GITHUB_REPOSITORY freetype/freetype
-        GIT_TAG VER-2-13-2
-        OPTIONS
-            "FT_DISABLE_HARFBUZZ ON"
-            "FT_WITH_HARFBUZZ OFF"
-    )
+if (TARGET freetype)
     add_library(TracyFreetype INTERFACE)
     target_link_libraries(TracyFreetype INTERFACE freetype)
+else()
+    pkg_check_modules(FREETYPE freetype2)
+    if (FREETYPE_FOUND AND NOT DOWNLOAD_FREETYPE)
+        add_library(TracyFreetype INTERFACE)
+        target_include_directories(TracyFreetype INTERFACE ${FREETYPE_INCLUDE_DIRS})
+        target_link_libraries(TracyFreetype INTERFACE ${FREETYPE_LINK_LIBRARIES})
+    else()
+        CPMAddPackage(
+            NAME freetype
+            GITHUB_REPOSITORY freetype/freetype
+            GIT_TAG VER-2-13-2
+            OPTIONS
+                "FT_DISABLE_HARFBUZZ ON"
+                "FT_WITH_HARFBUZZ OFF"
+        )
+        add_library(TracyFreetype INTERFACE)
+        target_link_libraries(TracyFreetype INTERFACE freetype)
+    endif()
 endif()
 
 # zstd
